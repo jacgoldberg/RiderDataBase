@@ -1,4 +1,5 @@
 from asyncio.windows_events import NULL
+from asyncore import loop
 import mysql.connector
 
 mydb = mysql.connector.connect(host="localhost", user="root", password="Password1",
@@ -9,7 +10,7 @@ mycursor.execute(
     "CREATE TABLE IF NOT EXISTS user (userID SMALLINT, userRating DECIMAL(3,2),name VARCHAR(15), status VARCHAR(15), PRIMARY KEY(userID));")
 mycursor.execute(
     "CREATE TABLE IF NOT EXISTS driver (driverID SMALLINT, driverRating DECIMAL(3,2), name VARCHAR(15), totalRides SMALLINT, status VARCHAR(15), PRIMARY KEY(driverID));")
-mycursor.execute("CREATE TABLE IF NOT EXISTS rides (rideID SMALLINT, price DECIMAL(3, 2), userID SMALLINT, date DATE, time TIME, driverID SMALLINT, startLocation VARCHAR(15), endLocation VARCHAR(15), status VARCHAR(15), PRIMARY KEY(rideID), FOREIGN KEY(userID) REFERENCES user(userID), FOREIGN KEY(driverID) REFERENCES driver(driverID));")
+mycursor.execute("CREATE TABLE IF NOT EXISTS rides (rideID SMALLINT, userID SMALLINT, driverID SMALLINT, startLocation VARCHAR(15), endLocation VARCHAR(15), status VARCHAR(15), PRIMARY KEY(rideID), FOREIGN KEY(userID) REFERENCES user(userID), FOREIGN KEY(driverID) REFERENCES driver(driverID));")
 
 
 class User:
@@ -71,7 +72,6 @@ def logIn(username, userID):
             print("Invalid login")
     return 1
 
-
 def main():
     print("Hello welcome to the rideshare app")
     username = input("Please enter your name: ")
@@ -85,9 +85,24 @@ def main():
             else:
                 if(tempStr == "n"):
                     changeRiderStatus(userID, 0)
+                    return 1
                 else:
                     print("Did not enter character correctly")
             print("Searching for rider...")
+            boolRiderFound = 1
+            while(boolRiderFound):
+                query = mycursor.execute("SELECT rideID FROM rides WHERE status = 'pending'")
+                q = mycursor.fetchall()
+                if(len(q) != 0):
+                    boolRiderFound = 0
+                    rideID = int(q[0][0])
+                    print(rideID)
+                    mycursor.execute(f"UPDATE rides SET driverID = {userID} WHERE rideID = {rideID}")
+            query = mycursor.execute(f"SELECT driverID FROM rides WHERE driverID = {userID}")
+            q = mycursor.fetchall()
+            print(int(q[0][0]))
+
+
             return 1
         
         
