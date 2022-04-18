@@ -23,7 +23,9 @@ class Driver:
             self.driverRating = rating
             self.name = name
             self .totalRides = totRides
-def logIn():
+def changeRiderStatus():
+    return 1
+def logIn(username, userID):
     username = input("Please enter your name: ")
     userID = input("Please enter your User ID number: ")
     # check to see if the user's name and id are stored in the db
@@ -65,9 +67,17 @@ def logIn():
 
 
 def main():
-    userType = logIn()
+    username = input("Please enter your name: ")
+    userID = input("Please enter your User ID number: ")
+    userType = logIn(username, userID)
     print("Hello welcome to the rideshare app")
-    if(userType):
+    while(1):
+        if(userType):
+            tempStr = input("Would you like to change your status?(Y/n): ")
+            if(tempStr == "Y"):
+                
+            return 1
+        
         
 
 
