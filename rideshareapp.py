@@ -29,9 +29,12 @@ class Driver:
             self.name = name
             self .totalRides = totRides
 def printRide(rideID):
-    mycursor.execute(f"SELECT * FROM RIDES WHERE rideID = {rideID}")
+    mycursor.execute(f"SELECT userID FROM rides WHERE rideID = {rideID}")
     q = mycursor.fetchall()
-    print(q)
+    userID = int(q[0][0])
+    query = mycursor.execute(f"SELECT name FROM user WHERE userID = {userID}")
+    q = mycursor.fetchall()
+    print(q[0][0])
     return 1
 def changeRiderStatus(userID, setToAV):
     if(setToAV):
@@ -41,6 +44,20 @@ def changeRiderStatus(userID, setToAV):
     #query = mycursor.execute(f"SELECT status FROM driver WHERE driverID = {userID}")
     #q = mycursor.fetchall()
     #print(q)
+    return 1
+
+def rateRider(rideID):
+    mycursor.execute(f"SELECT userID FROM rides WHERE rideID = {rideID}")
+    userID = mycursor.fetchall()
+    mycursor.execute(f"SELECT userRating, name FROM user WHERE userID = {userID[0][0]}")
+    user = mycursor.fetchall()
+    userRating = input(
+        "Please rate " + user[0][1] + " (out of a 5.0 scale): ")
+    rating = ((float(user[0][0]) +
+              float(userRating)) / 2)
+    mycursor.execute(
+        f"UPDATE user SET userRating = {rating} WHERE userID = {int(userID[0][0])}")
+    mydb.commit()
     return 1
 
 def logIn(username, userID):
@@ -55,9 +72,7 @@ def logIn(username, userID):
             query2 = mycursor.execute(f"SELECT name FROM driver WHERE driverID = {userID}")
             q2 = mycursor.fetchall()
             dbName = q2[0][0]
-            print(dbName)
             if(username == dbName):
-                print("Matched")
                 #function call
                 return 1
     else:
@@ -113,8 +128,6 @@ def checkRideStatus(rideID):
         mycursor.execute(
             f"SELECT status, driverID, userID FROM rides WHERE rideID = {rideID}")
         rideStatus = mycursor.fetchall()
-        print(rideStatus)
-        print(rideStatus[0][0])
         if (rideStatus[0][0] == 'accepted'):
             print("Driver found.")
             printDriverInfo(int(rideStatus[0][1]))
@@ -163,7 +176,7 @@ def rateDriver(rideID):
     rating = (((float(driver[0][0]) * float(driver[0][2])) +
               float(driverRating)) / (float(driver[0][2])) + 1)
     mycursor.execute(
-        f"UPDATE driver SET driverRating = {rating} WHERE driverID = {int(driverID[0][0])}")
+        f"UPDATE driver SET driverRating = {rating} WHERE driverID = {driverID[0][0]}")
     mydb.commit()
 
 
@@ -203,15 +216,17 @@ def main():
                     if(answer == "Y"):
                         mycursor.execute(f"UPDATE rides SET status = 'accepted', driverID = {userID} WHERE rideID = {rideID}")
                         mydb.commit()
-                        #mycursor.execute(f"UPDATE rides SET status = 'accepted' WHERE rideID = {rideID}")
-                        #mydb.commit()
-                        query = mycursor.execute(f"SELECT * FROM rides WHERE rideID = {rideID}")
-                        q = mycursor.fetchall()
-                        print(q)
+                        mycursor.execute(f"SELECT COUNT(*) FROM rides WHERE driverID = {userID}")
+                        totalRides = mycursor.fetchall()
+                        mycursor.execute(f"UPDATE driver SET totalRides = {int(totalRides[0][0])} WHERE driverID = {userID}")
+                        mydb.commit()
+                        rateRider(rideID)
+                        return 1
                     else:
                         changeRiderStatus(userID, 0)
                         mydb.commit()
                         return 1
+            
         elif userType == 0:
             userInput = input(
                 "Would you like to change your status to available? \n (\'Y\' for yes and \'N\' for no): ")
