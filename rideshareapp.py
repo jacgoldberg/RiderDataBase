@@ -23,11 +23,11 @@ class Driver:
             self.driverRating = rating
             self.name = name
             self .totalRides = totRides
-def changeRiderStatus():
+def changeRiderStatus(userID):
+    mycursor.execute(f"UPDATE driver SET status = 'available' WHERE driverID = {userID}")
     return 1
+
 def logIn(username, userID):
-    username = input("Please enter your name: ")
-    userID = input("Please enter your User ID number: ")
     # check to see if the user's name and id are stored in the db
     #mycursor.execute("SELECT userID, name FROM user WHERE")
     query1 = mycursor.execute(f"SELECT driverID FROM driver WHERE driverID = {userID}")
@@ -67,15 +67,16 @@ def logIn(username, userID):
 
 
 def main():
+    print("Hello welcome to the rideshare app")
     username = input("Please enter your name: ")
     userID = input("Please enter your User ID number: ")
     userType = logIn(username, userID)
-    print("Hello welcome to the rideshare app")
     while(1):
         if(userType):
             tempStr = input("Would you like to change your status?(Y/n): ")
             if(tempStr == "Y"):
-                
+                changeRiderStatus(userID)
+
             return 1
         
         
