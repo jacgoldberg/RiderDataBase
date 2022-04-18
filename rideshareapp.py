@@ -23,8 +23,14 @@ class Driver:
             self.driverRating = rating
             self.name = name
             self .totalRides = totRides
-def changeRiderStatus(userID):
-    mycursor.execute(f"UPDATE driver SET status = 'available' WHERE driverID = {userID}")
+def changeRiderStatus(userID, setToAV):
+    if(setToAV):
+        mycursor.execute(f"UPDATE driver SET status = 'available' WHERE driverID = {userID}")
+    else:
+        mycursor.execute(f"UPDATE driver SET status = 'unavailable' WHERE driverID = {userID}")
+    query = mycursor.execute(f"SELECT status FROM driver WHERE driverID = {userID}")
+    q = mycursor.fetchall()
+    print(q)
     return 1
 
 def logIn(username, userID):
@@ -75,8 +81,12 @@ def main():
         if(userType):
             tempStr = input("Would you like to change your status?(Y/n): ")
             if(tempStr == "Y"):
-                changeRiderStatus(userID)
-
+                changeRiderStatus(userID, 1)
+            else:
+                if(tempStr == "n"):
+                    changeRiderStatus(userID, 0)
+                else:
+                    print("Did not enter character correctly")
             return 1
         
         
