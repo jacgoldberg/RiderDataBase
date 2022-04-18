@@ -8,8 +8,8 @@ mycursor = mydb.cursor()
 mycursor.execute(
     "CREATE TABLE IF NOT EXISTS user (userID SMALLINT, userRating DECIMAL(3,2),name VARCHAR(15), status VARCHAR(15), PRIMARY KEY(userID));")
 mycursor.execute(
-    "CREATE TABLE IF NOT EXISTS driver (driverID SMALLINT, driverRating DECIMAL(3,2), name VARCHAR(15), totalRides SMALLINT, PRIMARY KEY(driverID));")
-mycursor.execute("CREATE TABLE IF NOT EXISTS rides (rideID SMALLINT, price DECIMAL(3, 2), userID SMALLINT, date DATE, time TIME, driverID SMALLINT, startLocation VARCHAR(15), endLocation VARCHAR(15), PRIMARY KEY(rideID), FOREIGN KEY(userID) REFERENCES user(userID), FOREIGN KEY(driverID) REFERENCES driver(driverID));")
+    "CREATE TABLE IF NOT EXISTS driver (driverID SMALLINT, driverRating DECIMAL(3,2), name VARCHAR(15), totalRides SMALLINT, status VARCHAR(15), PRIMARY KEY(driverID));")
+mycursor.execute("CREATE TABLE IF NOT EXISTS rides (rideID SMALLINT, price DECIMAL(3, 2), userID SMALLINT, date DATE, time TIME, driverID SMALLINT, startLocation VARCHAR(15), endLocation VARCHAR(15), status VARCHAR(15), PRIMARY KEY(rideID), FOREIGN KEY(userID) REFERENCES user(userID), FOREIGN KEY(driverID) REFERENCES driver(driverID));")
 
 
 class User:
@@ -28,9 +28,9 @@ def changeRiderStatus(userID, setToAV):
         mycursor.execute(f"UPDATE driver SET status = 'available' WHERE driverID = {userID}")
     else:
         mycursor.execute(f"UPDATE driver SET status = 'unavailable' WHERE driverID = {userID}")
-    query = mycursor.execute(f"SELECT status FROM driver WHERE driverID = {userID}")
-    q = mycursor.fetchall()
-    print(q)
+    #query = mycursor.execute(f"SELECT status FROM driver WHERE driverID = {userID}")
+    #q = mycursor.fetchall()
+    #print(q)
     return 1
 
 def logIn(username, userID):
@@ -87,6 +87,7 @@ def main():
                     changeRiderStatus(userID, 0)
                 else:
                     print("Did not enter character correctly")
+            print("Searching for rider...")
             return 1
         
         
